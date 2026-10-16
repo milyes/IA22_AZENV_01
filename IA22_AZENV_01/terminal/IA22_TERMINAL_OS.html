@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>IA22 TERMINAL OS — Cockpit Orbitronique</title>
+
+<style>
+body {
+  background: #02030a;
+  color: #e0f7fa;
+  font-family: "Fira Code", monospace;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* HUD */
+#hud {
+  padding: 12px;
+  border-bottom: 1px solid #00e5ff;
+  box-shadow: 0 0 12px #00e5ff55;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Dock */
+#dock {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #000000aa;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #00e5ff55;
+}
+
+/* Fenêtres orbitroniques */
+.window {
+  position: absolute;
+  top: 80px;
+  left: 80px;
+  width: 420px;
+  height: 300px;
+  background: #000000cc;
+  border: 1px solid #00e5ff55;
+  box-shadow: 0 0 12px #00e5ff55;
+  padding: 10px;
+  resize: both;
+  overflow: auto;
+  display: none;
+}
+
+.window-header {
+  background: #00e5ff22;
+  padding: 6px;
+  cursor: move;
+  font-weight: bold;
+}
+
+/* Modes */
+.synaptic { animation: synapticPulse 3s infinite alternate; }
+@keyframes synapticPulse {
+  from { box-shadow: 0 0 8px #00e5ff55; }
+  to   { box-shadow: 0 0 22px #00e5ffdd; }
+}
+
+.cyber {
+  background: #000;
+  color: #0ff;
+}
+.cyber .window {
+  background: #001;
+  border-color: #0ff;
+  color: #0ff;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .window { width: 90%; height: 60%; left: 5%; top: 100px; }
+}
+</style>
+</head>
+
+<body>
+
+<div id="hud">
+  <div>🛰️ IA22 TERMINAL OS — Cockpit Orbitronique</div>
+  <div>
+    <button onclick="setMode('classic')">CLASSIC</button>
+    <button onclick="setMode('synaptic')">SYNAPTIC</button>
+    <button onclick="setMode('cyber')">CYBER‑NOIR</button>
+  </div>
+</div>
+
+<div id="dock">
+  <button onclick="openWindow('pulse')">Pulse</button>
+  <button onclick="openWindow('visual')">Visual</button>
+  <button onclick="openWindow('shield')">ICE_SHIELD</button>
+  <button onclick="openWindow('m2m')">M2M Log</button>
+  <button onclick="openWindow('core')">Core</button>
+</div>
+
+<!-- Fenêtres orbitroniques -->
+<div id="pulse" class="window">
+  <div class="window-header">📡 Pulsation IA22</div>
+  <pre id="pulse_out">En attente...</pre>
+</div>
+
+<div id="visual" class="window">
+  <div class="window-header">🧩 Visualisation Orbitronique</div>
+  <pre id="visual_out">En attente...</pre>
+</div>
+
+<div id="shield" class="window">
+  <div class="window-header">🛡️ ICE_SHIELD Monitor</div>
+  <pre id="shield_out">En attente...</pre>
+</div>
+
+<div id="m2m" class="window">
+  <div class="window-header">📜 Journal M2M IA22</div>
+  <pre id="m2m_out">En attente...</pre>
+</div>
+
+<div id="core" class="window">
+  <div class="window-header">⚙️ IA22 Core</div>
+  <pre>Module IA22_BIN prêt à être intégré.</pre>
+</div>
+
+<script>
+function openWindow(id) {
+  document.getElementById(id).style.display = "block";
+}
+
+function setMode(mode) {
+  document.body.classList.remove("synaptic", "cyber");
+  if (mode === "synaptic") document.body.classList.add("synaptic");
+  if (mode === "cyber") document.body.classList.add("cyber");
+}
+</script>
+
+</body>
+</html>
