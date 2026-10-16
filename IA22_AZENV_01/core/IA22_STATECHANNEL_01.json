@@ -1,1 +1,10 @@
-{"cockpit_state":"IDLE","ice_shield":"ARMED","orbitron_core":"READY"}
+{
+  "cockpit_state": "ACTIVE",
+  "ice_shield": "ARMED",
+  "orbitron_core": "BIN_ACTIVE",
+  "pulse": 1,
+  "synapses": [
+    "d1393981d8bbf3b9"
+  ],
+  "timestamp": 1792191865.5559072
+}
