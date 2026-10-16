@@ -1,0 +1,19 @@
+body {
+  background: radial-gradient(circle at top, #0d47a1 0%, #000000 55%, #000000 100%);
+  color: #e0f7fa;
+  font-family: "Fira Code", monospace;
+}
+.cockpit {
+  padding: 18px;
+  border: 1px solid #00e5ff;
+  box-shadow: 0 0 18px #00e5ff88;
+  animation: cockpitGlow 3s infinite alternate;
+}
+@keyframes cockpitGlow {
+  from { box-shadow: 0 0 8px #00e5ff55; }
+  to   { box-shadow: 0 0 22px #00e5ffdd; }
+}
+.pulse {
+  color: #00e5ff;
+  text-shadow: 0 0 6px #00e5ff;
+}
