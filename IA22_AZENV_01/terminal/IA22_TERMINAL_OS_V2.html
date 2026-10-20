@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IA22 TERMINAL OS V2 — BRIDGE LIVE</title>
+<style>
+:root{--g:#0f0;--bg:#000;--dim:#0a0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#0f0;font-family:'Courier New',monospace;padding:20px;overflow:hidden}
+.header{border:1px solid var(--g);padding:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 20px rgba(0,255,0,.2)}
+.header h1{font-size:16px;letter-spacing:3px}
+.live{width:10px;height:10px;background:var(--g);border-radius:50%;display:inline-block;animation:blink 1s infinite;box-shadow:0 0 10px var(--g)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px}
+.card{border:1px solid var(--dim);padding:15px;background:rgba(0,255,0,.03);position:relative}
+.card h3{font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:10px}
+.value{font-size:28px;font-weight:bold;text-shadow:0 0 10px var(--g)}
+.pulse-bar{height:4px;background:var(--dim);margin-top:10px;overflow:hidden}
+.pulse-fill{height:100%;background:var(--g);width:0%;transition:width .5s;box-shadow:0 0 10px var(--g)}
+.synapse{display:inline-block;border:1px solid var(--g);padding:4px 8px;margin:4px;font-size:11px;background:rgba(0,255,0,.1);animation:orbit 3s linear infinite}
+@keyframes orbit{0%{transform:translateY(0)}50%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+.log{height:120px;overflow-y:auto;border:1px solid var(--dim);padding:10px;margin-top:15px;font-size:10px;background:#050505}
+.log div{margin:2px 0}
+.ok{color:var(--g)}.warn{color:#ff0}.err{color:#f00}
+.footer{margin-top:15px;display:flex;gap:10px}
+.btn{border:1px solid var(--g);background:transparent;color:var(--g);padding:8px 15px;cursor:pointer;font-family:monospace;letter-spacing:1px}
+.btn:hover{background:var(--g);color:#000}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>🛰 IA22 TERMINAL OS V2 — Z-CORE BRIDGE <span class="live"></span> LIVE 8000</h1>
+<div id="clock">00:00:00</div>
+</div>
+
+<div class="grid">
+<div class="card"><h3>COCKPIT STATE</h3><div class="value" id="cockpit">LOADING</div><div class="pulse-bar"><div class="pulse-fill" id="bar1"></div></div></div>
+<div class="card"><h3>ORBITRON CORE</h3><div class="value" id="orbitron">--</div><div class="pulse-bar"><div class="pulse-fill" id="bar2"></div></div></div>
+<div class="card"><h3>ICE SHIELD</h3><div class="value" id="ice">--</div><div id="pulse-val" style="font-size:12px;margin-top:8px">PULSE: 0</div></div>
+<div class="card"><h3>SYNAPSES ACTIVE</h3><div id="synapses">--</div><div style="font-size:10px;margin-top:8px" id="ts">--</div></div>
+</div>
+
+<div class="log" id="log"></div>
+
+<div class="footer">
+<button class="btn" onclick="fetchIA22()">↻ FORCE REFRESH</button>
+<button class="btn" onclick="window.open('/api/status','_blank')">/api/status</button>
+<button class="btn" onclick="window.open('/api/ia22','_blank')">/api/ia22</button>
+<span style="font-size:10px;opacity:.5;margin-left:auto">HASH 89b6df2e-v24 | v1_10 BRIDGE FINAL | 23 logics</span>
+</div>
+
+<script>
+const HASH="89b6df2e-v24";
+const URLS=["http://127.0.0.1:8000/api/ia22","http://127.0.0.1:8001/api/ia22"];
+let okCount=0;
+
+function log(m,c="ok"){const el=document.getElementById('log');const d=document.createElement('div');d.className=c;d.textContent=`[${new Date().toLocaleTimeString()}] ${m}`;el.prepend(d);if(el.children.length>30)el.lastChild.remove();}
+
+async function fetchIA22(){
+ for(let url of URLS){
+  try{
+   const r=await fetch(url,{headers:{"X-ZCORE-Token":HASH}});
+   if(!r.ok) throw new Error(r.status);
+   const j=await r.json();
+   if(j.cockpit_state){
+    document.getElementById('cockpit').textContent=j.cockpit_state;
+    document.getElementById('orbitron').textContent=j.orbitron_core;
+    document.getElementById('ice').textContent=j.ice_shield;
+    document.getElementById('pulse-val').textContent=`PULSE: ${j.pulse} | HASH: ${HASH}`;
+    document.getElementById('ts').textContent=`TIMESTAMP: ${j.timestamp}`;
+    document.getElementById('bar1').style.width=(j.pulse*20+20)+"%";
+    document.getElementById('bar2').style.width="100%";
+    const syn=document.getElementById('synapses'); syn.innerHTML="";
+    (j.synapses||[]).forEach(s=>{const b=document.createElement('span');b.className='synapse';b.textContent=s;syn.appendChild(b);});
+    if(j.pulse!==okCount){log(`PULSE #${j.pulse} BIN_ACTIVE ${j.synapses[0]} -> ${url}`,"ok"); okCount=j.pulse;}
+    return;
+   } else {
+    // c'est /api/status
+    log(`Z-CORE ${j.version} LIVE ${j.port} - ${j.status}`,"ok");
+   }
+  }catch(e){log(`FAIL ${url} -> ${e.message}`,"warn");}
+ }
+ log("BRIDGE OFFLINE - retry...","err");
+ document.getElementById('cockpit').textContent="OFFLINE";
+}
+
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString();},1000);
+setInterval(fetchIA22,2000);
+fetchIA22();
+log("IA22 TERMINAL OS V2 INITIALIZED - BRIDGE 89b6df2e-v24","ok");
+</script>
+</body>
+</html>
